@@ -312,20 +312,10 @@
       const messageDiv = document.getElementById('message');
 
       try {
-        const response =await fetch('https://script.google.com/macros/s/AKfycbw9DVkO2IcGpW1_7KyWTpGMbXUGQizpwA8Z-jvIopRtY3GlvFpyI5a1l7Uk0xhGO6es/exec', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    name,
-    email,
-    busStand,
-    complaintText,
-    imageURL: '', // or pass a real one if you use Firebase or file uploads
-  })
-});
-
+        const response = await fetch('http://localhost:5000/api/complaints', {
+          method: 'POST',
+          body: formData
+        });
 
         if (response.ok) {
           messageDiv.textContent = '✅ Thank you! Your complaint has been submitted.';
@@ -342,5 +332,66 @@
       }
     });
   </script>
+  <!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDzwRiW3caKlh_Yg-NRx0zHBFr-BINmW_M",
+    authDomain: "bus-stand-complaint-23273.firebaseapp.com",
+    projectId: "bus-stand-complaint-23273",
+    storageBucket: "bus-stand-complaint-23273.firebasestorage.app",
+    messagingSenderId: "551347920830",
+    appId: "1:551347920830:web:335be22d194d2babd823ef"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  // Attach form listener
+  document.getElementById('complaintForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const busStand = document.getElementById('busStand').value.trim();
+    const complaintText = document.getElementById('complaintText').value.trim();
+    const file = document.getElementById('photo').files[0];
+
+    const messageDiv = document.getElementById('message');
+    messageDiv.textContent = 'Submitting complaint...';
+    messageDiv.className = '';
+
+    try {
+      let imageURL = '';
+      if (file) {
+        const storageRef = ref(storage, 'complaints/' + Date.now() + '_' + file.name);
+        await uploadBytes(storageRef, file);
+        imageURL = await getDownloadURL(storageRef);
+      }
+
+      await addDoc(collection(db, "complaints"), {
+        name,
+        email,
+        busStand,
+        complaintText,
+        imageURL,
+        timestamp: new Date().toISOString()
+      });
+
+      messageDiv.textContent = '✅ Thank you! Your complaint has been submitted.';
+      messageDiv.className = 'success';
+      document.getElementById('complaintForm').reset();
+
+    } catch (err) {
+      console.error(err);
+      messageDiv.textContent = '❌ Failed to submit complaint.';
+      messageDiv.className = 'error';
+    }
+  });
+</script>
 </body>
 </html>
