@@ -312,10 +312,20 @@
       const messageDiv = document.getElementById('message');
 
       try {
-        const response = await fetch('http://localhost:5000/api/complaints', {
-          method: 'POST',
-          body: formData
-        });
+        const response =await fetch('https://script.google.com/macros/s/AKfycbw9DVkO2IcGpW1_7KyWTpGMbXUGQizpwA8Z-jvIopRtY3GlvFpyI5a1l7Uk0xhGO6es/exec', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    name,
+    email,
+    busStand,
+    complaintText,
+    imageURL: '', // or pass a real one if you use Firebase or file uploads
+  })
+});
+
 
         if (response.ok) {
           messageDiv.textContent = '✅ Thank you! Your complaint has been submitted.';
