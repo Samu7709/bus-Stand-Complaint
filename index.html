@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
   <meta charset="UTF-8">
   <title>MSRTC Complaint Portal</title>
   <style>
@@ -154,14 +152,7 @@
     #message {
       margin-top: 20px;
       font-weight: bold;
-    }
-
-    .success {
       color: #66bb6a;
-    }
-
-    .error {
-      color: #ef5350;
     }
 
     @media (max-width: 600px) {
@@ -178,7 +169,7 @@
 </head>
 <body>
   <!-- 🔴 3D Background -->
-  <div id="three-container"></div>
+  <div id="three-container"><canvas data-engine="three.js r157" width="726" height="633" style="display: block; width: 726px; height: 633px;"></canvas></div>
 
   <!-- 🔝 Navigation Bar -->
   <div class="navbar">
@@ -216,15 +207,16 @@
       </div>
     </div>
 
-    <form id="complaintForm">
-      <input type="text" id="name" placeholder="Your Name" required>
-      <input type="email" id="email" placeholder="Your Email" required>
-      <input type="text" id="busStand" placeholder="Bus Stand Location" required>
-      <textarea id="complaintText" placeholder="Enter your complaint..." rows="4" required></textarea>
-      <input type="file" id="photo" accept="image/*">
+    <!-- 📤 Complaint Form -->
+    <form action="https://formspree.io/f/xwplgjrz" method="POST" enctype="multipart/form-data">
+      <input type="text" name="name" placeholder="Your Name" required="">
+      <input type="email" name="email" placeholder="Your Email" required="">
+      <input type="text" name="busStand" placeholder="Bus Stand Location" required="">
+      <textarea name="complaintText" placeholder="Enter your complaint..." rows="4" required=""></textarea>
+      <input type="file" name="photo" accept="image/*">
       <button type="submit">Submit Complaint</button>
     </form>
-    <div id="message"></div>
+    <div id="message">You'll get a confirmation email from Formspree if everything goes well.</div>
   </div>
 
   <!-- 🔁 3D Script -->
@@ -294,50 +286,6 @@
       camera.updateProjectionMatrix();
       renderer.setSize(container.offsetWidth, container.offsetHeight);
     });
-  </script>
-
-  <!-- 📤 Form Submission -->
-  <script>
-    document.getElementById('complaintForm').addEventListener('submit', async function (e) {
-  e.preventDefault();
-  
-  const form = document.getElementById('complaintForm');
-  const formData = new FormData(form);
-  
-  // Create a data object to send
-  const data = {
-    name: document.getElementById('name').value,
-    email: document.getElementById('email').value,
-    busStand: document.getElementById('busStand').value,
-    complaintText: document.getElementById('complaintText').value,
-    imageUrl: ''  // Optional, you can add logic for image uploading here if needed
-  };
-
-  // Send form data as JSON to Google Apps Script
-  try {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbwDzfB2gMNP0gOrRpd4uCX7M7bgPTgaeYPoNv48i_6Gxp0xmVKZmN_mrofqZIoFAKdPyA/exec', {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (response.ok) {
-      document.getElementById('message').textContent = '✅ Complaint submitted!';
-      document.getElementById('message').className = 'success';
-      form.reset();
-    } else {
-      document.getElementById('message').textContent = '❌ Failed to submit complaint.';
-      document.getElementById('message').className = 'error';
-    }
-  } catch (err) {
-    console.error(err);
-    document.getElementById('message').textContent = '⚠️ Error connecting to server.';
-    document.getElementById('message').className = 'error';
-  }
-});
-
   </script>
 </body>
 </html>
